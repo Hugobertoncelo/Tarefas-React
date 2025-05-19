@@ -7,6 +7,10 @@ const GlobalStyles = createGlobalStyle`
     box-sizing: border-box;
     outline: none;
   }
+
+  * {
+    font-family: "Roboto", sans-serif;
+  }
 `
 
 export default GlobalStyles;
