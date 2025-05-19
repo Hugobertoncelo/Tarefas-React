@@ -1,12 +1,17 @@
 import React, { useState } from "react";
 import { v4 as uuid } from "uuid";
-import { Container, ToDoList, Input, Button, ListItem } from "./styles.js";
-import { FcEmptyTrash, FcCheckmark } from "react-icons/fc";
+import {
+  Container,
+  ToDoList,
+  Input,
+  Button,
+  ListItem,
+  Trash,
+  Check,
+} from "./styles.js";
 
 function App() {
-  const [list, setList] = useState([
-    { id: uuid(), task: "Nada", finished: true },
-  ]);
+  const [list, setList] = useState([]);
   const [inputTask, setInputTask] = useState("");
 
   function changed(event) {
@@ -14,7 +19,9 @@ function App() {
   }
 
   function buttonActivated() {
-    setList([...list, { id: uuid(), task: inputTask, finished: false }]);
+    if (inputTask) {
+      setList([...list, { id: uuid(), task: inputTask, finished: false }]);
+    }
   }
 
   function finishTask(id) {
@@ -25,6 +32,11 @@ function App() {
     setList(newList);
   }
 
+  function deleteItem(id) {
+    const newList = list.filter((item) => item.id !== id);
+    setList(newList);
+  }
+
   return (
     <Container>
       <ToDoList>
@@ -32,13 +44,17 @@ function App() {
         <Button onClick={buttonActivated}>Adcionar</Button>
 
         <ul>
-          {list.map((item) => (
-            <ListItem isFinished={item.finished} key={item.id}>
-              <FcCheckmark onClick={() => finishTask(item.id)} />
-              <li>{item.task}</li>
-              <FcEmptyTrash />
-            </ListItem>
-          ))}
+          {list.length > 0 ? (
+            list.map((item) => (
+              <ListItem isFinished={item.finished} key={item.id}>
+                <Check onClick={() => finishTask(item.id)} />
+                <li>{item.task}</li>
+                <Trash onClick={() => deleteItem(item.id)} />
+              </ListItem>
+            ))
+          ) : (
+            <h3>Não há itens na lista</h3>
+          )}
         </ul>
       </ToDoList>
     </Container>
