@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { v4 as uuid } from "uuid";
 import {
   Container,
@@ -11,16 +11,34 @@ import {
 } from "./styles.js";
 
 function App() {
-  const [list, setList] = useState([]);
+  const [list, setList] = useState(() => {
+    const storedList = localStorage.getItem("todoList");
+    return storedList ? JSON.parse(storedList) : [];
+  });
+
   const [inputTask, setInputTask] = useState("");
+
+  useEffect(() => {
+    localStorage.setItem("todoList", JSON.stringify(list));
+  }, [list]);
 
   function changed(event) {
     setInputTask(event.target.value);
   }
 
   function buttonActivated() {
-    if (inputTask) {
-      setList([...list, { id: uuid(), task: inputTask, finished: false }]);
+    if (inputTask.trim()) {
+      setList([
+        ...list,
+        { id: uuid(), task: inputTask.trim(), finished: false },
+      ]);
+      setInputTask("");
+    }
+  }
+
+  function handleKeyPress(event) {
+    if (event.key === "Enter") {
+      buttonActivated();
     }
   }
 
@@ -28,7 +46,6 @@ function App() {
     const newList = list.map((item) =>
       item.id === id ? { ...item, finished: !item.finished } : item
     );
-
     setList(newList);
   }
 
@@ -40,8 +57,13 @@ function App() {
   return (
     <Container>
       <ToDoList>
-        <Input onChange={changed} placeholder="O que tenho que fazer..." />
-        <Button onClick={buttonActivated}>Adcionar</Button>
+        <Input
+          value={inputTask}
+          onChange={changed}
+          onKeyDown={handleKeyPress}
+          placeholder="O que tenho que fazer..."
+        />
+        <Button onClick={buttonActivated}>Adicionar</Button>
 
         <ul>
           {list.length > 0 ? (
